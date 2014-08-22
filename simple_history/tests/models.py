@@ -264,3 +264,14 @@ class Province(models.Model):
 class City(models.Model):
     country = models.ForeignKey(Country, db_column='countryCode')
     history = HistoricalRecords()
+
+
+class TrackedAbstractBase(models.Model):
+    history = HistoricalRecords()
+
+    class Meta:
+        abstract = True
+
+
+class Tracked(TrackedAbstractBase):
+    pass

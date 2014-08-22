@@ -19,7 +19,7 @@ from ..models import (
     ExternalModel1, ExternalModel3, UnicodeVerboseName, HistoricalChoice,
     HistoricalState, HistoricalCustomFKError, Series, SeriesWork, PollInfo,
     UserAccessorDefault, UserAccessorOverride, Employee, Country, Province,
-    City
+    City, Tracked
 )
 from ..external.models import ExternalModel2, ExternalModel4
 
@@ -745,3 +745,9 @@ class TestMissingOneToOne(TestCase):
         self.assertEqual(original.manager_id, 1)
         with self.assertRaises(Employee.DoesNotExist):
             original.manager
+
+
+class TestAbstractHistoricalBaseModel(TestCase):
+
+    def test_historical_abstract(self):
+        Tracked.history.all()

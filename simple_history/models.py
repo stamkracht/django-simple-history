@@ -230,9 +230,14 @@ class HistoricalRecords(object):
         history_date = getattr(instance, '_history_date', now())
         history_user = self.get_history_user(instance)
         manager = getattr(instance, self.manager_name)
+        
         attrs = {}
-        for field in instance._meta.fields:
-            attrs[field.attname] = getattr(instance, field.attname)
+        expected_attnames = {f.attname for f in manager.model._meta.fields}
+        instance_attnames = {f.attname for f in instance._meta.fields}
+        
+        for attr_name in expected_attnames.intersection(instance_attnames):
+            attrs[attr_name] = getattr(instance, attr_name)
+            
         manager.create(history_date=history_date, history_type=history_type,
                        history_user=history_user, **attrs)
 

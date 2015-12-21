@@ -484,8 +484,11 @@ class HistoricalRecords(object):
         manager = getattr(instance, self.manager_name)
 
         attrs = {}
-        for field in self.fields_included(instance):
-            attrs[field.attname] = getattr(instance, field.attname)
+        expected_attnames = {f.attname for f in manager.model._meta.fields}
+        instance_attnames = {f.attname for f in self.fields_included(instance)}
+
+        for attr_name in expected_attnames.intersection(instance_attnames):
+            attrs[attr_name] = getattr(instance, attr_name)
 
         relation_field = getattr(manager.model, "history_relation", None)
         if relation_field is not None:

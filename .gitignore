@@ -4,6 +4,7 @@
 *.pyc
 .coverage
 .idea
+/.idea
 .tox/
 .venv/
 /.project

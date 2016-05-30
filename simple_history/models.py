@@ -31,6 +31,13 @@ from .manager import HistoryDescriptor
 registered_models = {}
 
 
+def expected_instance_attribute_names(manager, instance):
+    expected_attnames = {f.attname for f in manager.model._meta.fields}
+    instance_attnames = {f.attname for f in instance._meta.fields}
+
+    return expected_attnames.intersection(instance_attnames)
+
+
 class HistoricalRecords(object):
     thread = threading.local()
 
@@ -232,10 +239,8 @@ class HistoricalRecords(object):
         manager = getattr(instance, self.manager_name)
 
         attrs = {}
-        expected_attnames = {f.attname for f in manager.model._meta.fields}
-        instance_attnames = {f.attname for f in instance._meta.fields}
 
-        for attr_name in expected_attnames.intersection(instance_attnames):
+        for attr_name in expected_instance_attribute_names(manager, instance):
             attrs[attr_name] = getattr(instance, attr_name)
 
         manager.create(history_date=history_date, history_type=history_type,

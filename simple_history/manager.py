@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from django.core.exceptions import ObjectDoesNotExist
 
 from django.db import models
 
@@ -42,19 +43,12 @@ class HistoryManager(models.Manager):
         if not self.instance:
             raise TypeError("Can't use most_recent() without a %s instance." %
                             self.model._meta.object_name)
-        tmp = []
-        for field in self.instance._meta.fields:
-            if isinstance(field, models.ForeignKey):
-                tmp.append(field.name + "_id")
-            else:
-                tmp.append(field.name)
-        fields = tuple(tmp)
+
         try:
-            values = self.get_queryset().values_list(*fields)[0]
-        except IndexError:
+            return self.latest('history_date').instance
+        except ObjectDoesNotExist:
             raise self.instance.DoesNotExist("%s has no historical record." %
                                              self.instance._meta.object_name)
-        return self.instance.__class__(*values)
 
     def as_of(self, date):
         """Get a snapshot as of a specific date.
